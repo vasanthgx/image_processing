@@ -1,24 +1,20 @@
 
 
-![logo](https://github.com/vasanthgx/label-smoothing/blob/main/images/logo.gif)
+![logo](https://github.com/vasanthgx/image_processing/blob/main/images/logo.gif)
 
 
 # Project Title
 
 
-**Literature Review  - "When Does Label Smoothing Help?" published in 2019 by the Google Brain team**
+**Introduction to Image Processing with OpenCV**
  <img src="https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/assets/74038190/b3fef2db-e671-4610-bb84-1d65533dc5fb" width="300" align='right'>
 
 <br><br>
 
 
-## Introduction
+## Overview
 
-- **Background**: It starts by acknowledging that neural network training is highly influenced by the loss function used for optimization.
-- **Historical Context**: Initially, backpropagation was derived for minimizing quadratic loss, but researchers found that using cross-entropy loss often leads to better classification performance and faster convergence.
-- **Exotic Objectives**: Even in the early days of neural network research, there were indications that using objectives other than cross-entropy could be beneficial.
-- **Label Smoothing Introduction**: Szegedy et al. introduced label smoothing as a technique to improve accuracy. Instead of using "hard" targets (i.e., one-hot encoded targets), it uses a smoothed version of targets.
-- **Applications**: Label smoothing has been successfully applied across various tasks such as image classification, speech recognition, and machine translation.
+Image processing is a method to perform operations on an image to enhance it or extract useful information. It is a rapidly growing technology with applications across various domains such as medical imaging, autonomous vehicles, robotics, and computer vision. This project aims to introduce the basics of image processing using the Open Source Computer Vision Library (OpenCV), a powerful and widely-used library for image and video processing.
 
 ![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/table1.png)
 
