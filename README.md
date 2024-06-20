@@ -27,7 +27,7 @@ The main objectives of this project are to:
 3. Provide hands-on experience with common image processing techniques.
 4. Develop skills to apply image processing in real-world applications.
 
-![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/math1.png)
+
 
 ### Why OpenCV ?
 
