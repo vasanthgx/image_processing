@@ -96,164 +96,112 @@ cv2_imshow(new_rgb_image)
 ```
 ![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic3.png)
 
-If the true label is class 2:
-- Hard targets: \( y = [0, 1, 0] \)
 
-#### Label Smoothing:
-Suppose we use a label smoothing parameter \( ϵ = 0.1 \):
-- Modified targets:
-  - For class 2 (true class): \( y_{LS} = [0.1, 0.9, 0.1] \) 
-  - Other classes: \( y_{LS} = [0.05, 0.05, 0.9] \) (uniform distribution)
 
-### Activations of Penultimate Layer:
-- \( x \) represents the activations of the penultimate layer of the neural network.
-- These activations are fed into the final layer to make predictions.
-- Example: If \( x = [0.5, 0.8, 0.3] \) (activations for three neurons in the penultimate layer).
+### Extracting the mask of the lady from the image through Otsu thresholding
 
-![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/math2.png)
+Otsu's thresholding is a global thresholding technique used in image processing to automatically perform clustering-based image thresholding or the reduction of a gray-level image to a binary image. It works by finding the threshold that minimizes the intra-class variance (or equivalently, maximizes the inter-class variance) of the black and white pixels.
 
-## Penultimate Layer Representations
+It involves the following process
 
-### Visualization Scheme
+- **Read the Image**: Load the image using OpenCV.
+- **Convert to Grayscale**: Convert the image to grayscale, as Otsu's method works on single-channel images.
+- **Apply Gaussian Blur**: Optionally apply a Gaussian blur to the image to reduce noise and improve thresholding.
+- **Otsu's Thresholding**: Apply Otsu's thresholding to binarize the image.
+- **Extract the Mask**: The result will be a binary image where the lady is separated from the background.
 
-1. **Steps**:
-   - Pick three classes.
-   - Find an orthonormal basis of the plane crossing the templates of these three classes.
-   - Project the activations of examples from these classes onto this plane.
+```
+img = cv.imread('portrait_lady.png', cv.IMREAD_GRAYSCALE)
+ret2, th2 = cv.threshold(img,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
+cv2_imshow(th2)
 
-2. **Results**:
-   - This 2-D visualization shows how activations cluster around the templates and how label smoothing affects the distances between these clusters.
+```
+![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic4.png)
 
-### Visualization Examples
 
-1. **CIFAR-10 with AlexNet**:
-   - Classes: "airplane", "automobile", "bird".
-   - Without label smoothing: Clusters are broader and more spread out.
-   - With label smoothing (factor of 0.1): Clusters are tighter and form regular triangles, indicating that examples are equidistant from all class templates.
 
-2. **CIFAR-100 with ResNet-56**:
-   - Classes: "beaver", "dolphin", "otter".
-   - Similar behavior observed, with label smoothing leading to tighter clusters and better accuracy.
-   - Without label smoothing: Higher absolute values in projections, indicating over-confident predictions.
+### Extracting the edges of just the person using only the morphological operations
 
-3. **ImageNet with Inception-v4**:
-   - Classes: "tench", "meerkat", "cleaver" (semantically different) and "toy poodle", "miniature poodle", "tench" (semantically similar).
-   - With semantically similar classes:
-     - Without label smoothing: Similar classes cluster close with isotropic spread.
-     - With label smoothing: Similar classes form an arc, maintaining equidistant from all class templates.
-   - Indicates that label smoothing helps in regularizing the distances even for fine-grained, semantically similar classes.
-   
-![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/visual1.png)
+Morphological operations in image processing are techniques that process images based on shapes. They apply a structuring element to an input image, producing an output image of the same size. The primary operations are dilation and erosion. Dilation adds pixels to the boundaries of objects, making them larger, while erosion removes pixels from object boundaries, making them smaller. These operations can be combined into more complex operations like opening (erosion followed by dilation) and closing (dilation followed by erosion). Morphological operations are used for tasks such as noise removal, image enhancement, object segmentation, and shape analysis.
 
-![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/table2.png)
+
+![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic5.png)
+
+
+
+### Extracting the edges using the  Canny Edge Detector
+
+The Canny edge detector is a popular technique in image processing used to detect a wide range of edges in images. It operates by identifying points where the gradient of intensity changes sharply, indicating an edge. The process involves several steps: smoothing the image to reduce noise using a Gaussian filter, computing the gradient magnitude and direction, applying non-maximum suppression to thin the edges, and finally, using hysteresis thresholding to detect and link edges based on high and low thresholds. The Canny detector is widely used in tasks like object detection, image segmentation, and feature extraction due to its robustness and accuracy.
+
+```
+img = cv.imread('portrait_lady.png', cv.IMREAD_GRAYSCALE)
+assert img is not None, "file could not be read, check with os.path.exists()"
+edges = cv.Canny(img,100,200)
+ 
+plt.subplot(121),plt.imshow(img,cmap = 'gray')
+plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+plt.subplot(122),plt.imshow(edges,cmap = 'gray')
+plt.title('Edge Image'), plt.xticks([]), plt.yticks([])
+ 
+plt.show()
+
+```
+![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic6.png)
+
+### Using Grabcut method to segment the given image
+
+The GrabCut algorithm is a powerful tool in image processing for foreground extraction and image segmentation. It refines an initial rough segmentation of an image into foreground and background regions. The process starts with the user defining a rectangle around the object of interest. The algorithm then iteratively uses a combination of graph cuts and Gaussian Mixture Models (GMM) to model the foreground and background. By minimizing the energy function that represents the color distributions and smoothness of the edges, GrabCut effectively separates the object from the background. This technique is widely used in applications requiring precise object extraction and image editing.
+
+```
+img = cv.imread('portrait_lady.png')
+
+mask = np.zeros(img.shape[:2],np.uint8)
+ 
+bgdModel = np.zeros((1,65),np.float64)
+fgdModel = np.zeros((1,65),np.float64)
+ 
+rect = (1,1,288,175)
+
+cv.grabCut(img,mask,rect,bgdModel,fgdModel,5,cv.GC_INIT_WITH_RECT)
+ 
+mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
+img = img*mask2[:,:,np.newaxis]
+ 
+plt.imshow(img)
+# ,plt.colorbar(),plt.show()
+```
+
+![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic7.png)
+
+
+
+
    
 ### Key Observations
 
-- **Effect of Label Smoothing**:
-  - It makes the activations of examples more structured by maintaining regular distances between different class templates.
-  - It reduces over-confidence in predictions, as shown by the constrained difference in logits.
-- **Independence from Architecture and Dataset**:
-  - The impact of label smoothing is consistent across different architectures and datasets.
-- **Erasure of Information**:
-  - Label smoothing can erase fine-grained information, making classes more uniformly distant from each other, which might sometimes reduce the richness of the representation.
+Key observations for this project on image processing using OpenCV include:
+
+- **Versatility of OpenCV**: OpenCV provides extensive functionalities for various image processing tasks, making it an essential tool for beginners and professionals.
+- **Efficiency**: OpenCV's optimized algorithms enable real-time processing, crucial for applications like video analysis and interactive systems.
+- **HSV Color Space**: Utilizing the HSV color space enhances tasks like color segmentation due to its intuitive representation of colors.
+- **Histogram Equalization**: This technique significantly improves image contrast, aiding in better feature extraction and visualization.
+- **Otsu's Thresholding**: It effectively binarizes images for object extraction without manual threshold selection.
+- **Morphological Operations**: These operations are vital for noise removal and shape analysis.
+- **Canny Edge Detection**: This method provides accurate edge detection, crucial for object recognition.
+- **GrabCut Algorithm**: It excels in precise foreground extraction, important for image editing and segmentation tasks.
 
 
 
 
 
-## Implicit model calibration
-
-### Calibration in Neural Networks
-- **Calibration** refers to how well the predicted probabilities of a model reflect the actual probabilities of the outcomes. A well-calibrated model's confidence scores match the actual accuracy.
-- **Expected Calibration Error (ECE)** is a metric used to measure calibration. A lower ECE indicates better calibration.
-
-### Modern Neural Networks and Calibration
-- Guo et al. [15] demonstrated that modern neural networks often exhibit poor calibration despite high performance, tending to be overconfident.
-- **Temperature Scaling** is a post-processing technique that improves calibration by scaling the logits (inputs to the softmax function) with a temperature parameter.
-
-### Label Smoothing
-- **Label Smoothing** is a technique that adjusts the hard labels by distributing some probability mass to all classes, thus preventing the network from becoming overconfident.
-- The authors propose that label smoothing not only prevents overconfidence but also improves calibration, similar to temperature scaling.
-
-### Image Classification Experiments
-- The experiments involve training a ResNet-56 on CIFAR-100 and an unspecified network on ImageNet.
-- **Reliability Diagrams** are used to visualize calibration. Perfect calibration is represented by a diagonal line where confidence equals accuracy.
-- **Results**:
-  - Without temperature scaling, models trained with hard targets are overconfident.
-  - Temperature scaling improves calibration significantly.
-  - Label smoothing also improves calibration, producing results comparable to temperature scaling.
-
-### Machine Translation Experiments
-- The experiments are conducted using the Transformer architecture on the English-to-German translation task.
-- **BLEU Score** is the metric used to evaluate translation quality, while **Negative Log-Likelihood (NLL)** measures the likelihood of the correct sequence under the model.
-- **Results**:
-  - Label smoothing improves both BLEU score and calibration compared to hard targets.
-  - Temperature scaling can improve calibration and BLEU score for hard targets but cannot match the BLEU score improvements achieved with label smoothing.
-  - Label smoothing results in worse NLL, indicating a trade-off between calibration and likelihood.
-
-### Key Findings
-- Label smoothing effectively calibrates neural networks for both image classification and machine translation tasks.
-- In image classification, label smoothing produces calibration similar to temperature scaling.
-- In machine translation, label smoothing improves BLEU scores more than temperature scaling, even though it results in worse NLL.
-- The relationship between calibration (ECE) and performance metrics (BLEU score) is complex, with label smoothing providing benefits that temperature scaling cannot fully replicate.
-
-
-
-
-## Knowledge distillation
-### Label Smoothing and Knowledge Distillation
-- **Label Smoothing:** This technique improves the teacher network's accuracy by smoothing the labels, distributing some probability mass across all classes, which prevents the model from becoming overconfident.
-- **Knowledge Distillation:** This process involves training a student network to mimic the teacher network. It uses a combination of the true labels and the teacher’s soft output (probabilities) to train the student.
-
-### The Problem with Label Smoothing in Distillation
-- When teachers are trained with label smoothing, although their accuracy improves, they produce inferior student networks compared to teachers trained with hard targets.
-- Initial observations showed that a non-convolutional teacher trained on translated MNIST digits with hard targets and dropout achieved a low test error. Distilling this teacher to a student produced a reasonably accurate student. However, when the teacher was trained with label smoothing instead of dropout, despite faster training and slightly better performance, the resulting student performed worse.
-
-### Mechanism of Distillation
-- In distillation, the cross-entropy loss used for training is modified to include both the true labels and the soft outputs of the teacher.
-- A parameter (ϵ) controls the balance between fitting the hard targets and approximating the softened teacher outputs.
-- Temperature scaling is used to control the smoothness of the teacher's output, exaggerating differences between probabilities of incorrect answers.
-
-### Experimental Setup and Findings
-- Experiments were conducted using the CIFAR-10 dataset, with a ResNet-56 teacher and an AlexNet student.
-- Four key results were analyzed:
-  1. **Teacher’s Accuracy:** As a function of the label smoothing factor.
-  2. **Student’s Baseline Accuracy:** As a function of the label smoothing factor without distillation.
-  3. **Student’s Accuracy Post-Distillation:** With temperature scaling, using a teacher trained with hard targets.
-  4. **Student’s Accuracy Post-Distillation:** Using a teacher trained with label smoothing.
-
-### Smoothness Index
-- To compare results, a smoothness index is defined. For scenarios involving label smoothing, it measures the mass allocated by the teacher to incorrect examples over the training set.
-- Results showed that students distilled from teachers trained with hard targets outperformed those trained with label smoothing, indicating that the relative information between logits is lost when using label smoothing.
-
-### Visualization and Information Erasure
-- Visualizations of examples from the training set showed that hard targets resulted in broad clusters of examples, indicating varied similarities to other classes. Label smoothing, however, resulted in tight, equally separated clusters, indicating less variation in similarities.
-- This "erasure" of information means that while label smoothing improves teacher accuracy, it hampers the distillation process because the nuanced information needed to distinguish between different classes is lost.
-
-### Mutual Information
-- The mutual information between the input and the logits was estimated to quantify information erasure.
-- Results showed that while training, mutual information initially increased but then decreased, especially for networks trained with label smoothing. This confirmed that the collapse of representations into small clusters leads to the loss of distinguishing information, resulting in poorer student performance during distillation.
-
-## Conclusion and Future work
-- The authors conclude that while label smoothing enhances the teacher network's accuracy, **it negatively impacts the distillation process by erasing crucial information. Consequently, teachers trained with label smoothing are not necessarily better at transferring knowledge to student networks.**
-
-**This detailed exploration highlights a trade-off when using label smoothing in the context of knowledge distillation: better teacher performance does not equate to better student performance due to the loss of informative nuances in the teacher's output**
-
-- **Summary of Findings**: Many modern models use label smoothing, but its underlying inductive bias is not fully understood. The paper summarizes observed behaviors during training with label smoothing, focusing on how it encourages tight and equally distant clusters in penultimate layer representations, visualized with a new scheme.
-
-- **Positive and Negative Effects**: Label smoothing improves generalization and calibration but can hinder distillation due to information erasure. It encourages treating incorrect classes equally probable, reducing structure in later representations and logit variation across predictions.
-
-- **Future Research Direction**: The relationship between label smoothing and the information bottleneck principle is highlighted. Label smoothing reduces mutual information, suggesting a new research direction. Understanding this relationship could impact compression, generalization, and information transfer.
-
-- **Implications for Calibration**: Extensive experiments show label smoothing's impact on implicit calibration of model predictions. This is crucial for interpretability and downstream tasks like beam-search that rely on calibrated likelihoods.
-
-In essence, the paper emphasizes the need for further exploration into the relationship between label smoothing, information theory principles, and its implications for model compression, generalization, and calibration.
 
 
 
 ## References
 
-1.	David E Rumelhart, Geoffrey E Hinton, Ronald J Williams, et al. Learning representations by back-propagating errors. [Nature.](https://www.nature.com/articles/323533a0)
+1.	[OpenCV documentation](https://docs.opencv.org/4.x/d6/d00/tutorial_py_root.html)
+
+2.  [Interactive Foreground Extraction using GrabCut Algorithm](https://docs.opencv.org/4.x/d8/d83/tutorial_py_grabcut.html)
 
 
 
