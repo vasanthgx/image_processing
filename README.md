@@ -25,7 +25,7 @@ The main objectives of this project are to:
 1. Introduce the fundamental concepts of image processing.
 2. Demonstrate the use of OpenCV for performing basic image processing tasks.
 3. Provide hands-on experience with common image processing techniques.
-4. Develop skills to apply image processing in real-world applications.
+
 
 
 
