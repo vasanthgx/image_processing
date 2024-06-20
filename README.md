@@ -18,31 +18,42 @@ Image processing is a method to perform operations on an image to enhance it or 
 
 ![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/table1.png)
 
-### Contributions
-1. **Visualization Method**: Introduces a novel visualization method based on linear projections of penultimate layer activations to understand differences between networks trained with and without label smoothing.
-2. **Calibration of Predictions**: Label smoothing aligns the confidences of predictions with their accuracies.
-3. **Effect on Distillation**: Shows that label smoothing negatively affects distillation, where student models perform worse when trained with label-smoothed teacher models due to loss of information in the logits.
+### Objectives
 
+The main objectives of this project are to:
+
+1. Introduce the fundamental concepts of image processing.
+2. Demonstrate the use of OpenCV for performing basic image processing tasks.
+3. Provide hands-on experience with common image processing techniques.
+4. Develop skills to apply image processing in real-world applications.
 
 ![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/math1.png)
 
-#### Mathematical Description of Label Smoothing:
-Suppose we have a neural network that predicts probabilities for \( K \) classes. Let's denote:
-- \( p_k \): Probability assigned to the \( k \)-th class by the model.
-- \( w_k \): Weights and biases of the last layer.
-- \( x \): Activations of the penultimate layer concatenated with a bias term.
+### Why OpenCV ?
 
-For a neural network trained with hard targets, the standard cross-entropy loss is minimized. For label smoothing, we modify the targets before calculating the loss.
+OpenCV (Open Source Computer Vision Library) is an open-source computer vision and machine learning software library. It has over 2,500 optimized algorithms, which can be used for various applications such as detecting and recognizing faces, identifying objects, classifying human actions in videos, tracking camera movements, extracting 3D models of objects, and much more. The library is written in C++ and has interfaces for Python, Java, and MATLAB/OCTAVE.
 
-Let's see how label smoothing modifies the targets:
+Key features of OpenCV include:
 
-For a network trained with **hard targets**:
-- True targets (\( y \)) are typically one-hot encoded vectors. For example:
-  - If the true label for a sample is class 3 out of 5 classes: \( y = [0, 0, 1, 0, 0] \).
+Wide Range of Functions: OpenCV offers a comprehensive set of functions for image processing, computer vision, and machine learning.
+Ease of Use: With interfaces in multiple programming languages, OpenCV is user-friendly and suitable for both beginners and professionals.
+Performance: OpenCV is highly optimized for real-time applications and can leverage hardware acceleration.
+Community and Support: As an open-source project, OpenCV has a large community of developers and extensive documentation and tutorials.
 
-![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/math3.png)
+![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/opencv.png)
 
-### Examples:
+### Loading an Image
+```
+import cv2 as cv
+import numpy as np
+from matplotlib import pyplot as plt
+
+img = cv.imread('portrait_lady.png', cv.IMREAD_COLOR)
+plt.imshow(img)
+img.shape
+
+```
+![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic1.png)
 Let's consider a simple example with 3 classes to illustrate:
 
 #### Hard Targets:
