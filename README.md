@@ -16,7 +16,7 @@
 
 Image processing is a method to perform operations on an image to enhance it or extract useful information. It is a rapidly growing technology with applications across various domains such as medical imaging, autonomous vehicles, robotics, and computer vision. This project aims to introduce the basics of image processing using the Open Source Computer Vision Library (OpenCV), a powerful and widely-used library for image and video processing.
 
-![alt text](https://github.com/vasanthgx/label-smoothing/blob/main/images/table1.png)
+
 
 ### Objectives
 
