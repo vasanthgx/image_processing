@@ -54,9 +54,48 @@ img.shape
 
 ```
 ![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic1.png)
-Let's consider a simple example with 3 classes to illustrate:
 
-#### Hard Targets:
+
+
+### Changing the colorspace to HSV
+![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic2.png)
+
+The HSV (Hue, Saturation, Value) color space is a cylindrical representation of colors, designed to be more intuitive for human perception. Hue represents the color type and is measured in degrees from 0 to 360. Saturation indicates the vibrancy of the color, ranging from 0 (gray) to 100% (full color). Value represents the brightness, ranging from 0 (black) to 100% (full brightness). Unlike the RGB color model, which is based on primary colors, HSV separates color information (hue) from intensity (value), making it particularly useful in image processing tasks like color segmentation and object detection.
+
+```
+hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+cv2_imshow(hsv)
+print(hsv.shape)
+```
+### Enhancing the contrast of the image through Histogram Equalization
+Histogram equalization is a technique in image processing used to enhance the contrast of an image. It works by redistributing the image's pixel intensity values so that they span the entire range of possible values, making the histogram of the output image approximately flat. This process increases the global contrast of images, especially when the usable data of the image is represented by close contrast values.
+
+It involves the following steps :
+
+- **Calculate Histogram**: Determine the frequency of each intensity level in the image.
+- **Compute Cumulative Distribution Function (CDF)**: Calculate the cumulative sum of the histogram values, which represents the cumulative distribution of pixel intensities.
+- **Normalize the CDF**: Normalize the CDF to ensure the intensity values span the entire range (e.g., 0 to 255 for an 8-bit image).
+- **Map Original Intensities**: Use the normalized CDF as a mapping function to transform the original pixel values to the new values.
+
+This results in an image with improved contrast, where details in darker or brighter regions become more visible. Histogram equalization is particularly effective for images with backgrounds and foregrounds that are both bright or both dark, increasing the dynamic range and making the features more distinct.
+
+using the function OpenCV function *equalizeHist( )* we acheive the above.
+
+```
+# Equivalise the histogram
+new_value = cv.equalizeHist(hsv[..., 2])
+
+# Update the value channel
+hsv[:, :, 2] = new_value
+
+# Convert image back to BGR
+new_rgb_image = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
+
+# Display
+cv2_imshow(new_rgb_image)
+```
+![alt text](https://github.com/vasanthgx/image_processing/blob/main/images/pic3.png)
+
 If the true label is class 2:
 - Hard targets: \( y = [0, 1, 0] \)
 
